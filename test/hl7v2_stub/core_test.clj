@@ -35,7 +35,15 @@
 (deftest test-basic-stubbing
   (testing "Basic message stubbing with exact match"
     (with-hl7-stub
-      {"ADT^A01" (fn [msg] (create-ack msg "AA" "ADT processed"))}
+      {"ADT^A01" (fn [msg] 
+                   ;; msg is the parsed HAPI Message object
+                   (println "Message type:" (type msg))
+                   (println "Message content:" (.encode parser msg))
+                   ;; You can access fields using Terser
+                   (let [terser (ca.uhn.hl7v2.util.Terser. msg)]
+                     (println "Patient ID:" (.get terser "/PID-3"))
+                     (println "Message Control ID:" (.get terser "/MSH-10")))
+                   (create-ack msg "AA" "ADT processed"))}
       (let [response-string (send-and-parse (create-adt-a01))]
         (is (.contains response-string "AA"))
         (is (.contains response-string "ADT processed"))))))
