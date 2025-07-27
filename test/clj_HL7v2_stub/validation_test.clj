@@ -102,6 +102,14 @@
           (is (not (nil? @received-msg)))
           (is (.contains (.encode parser response) "MSA|AA"))))))
   
+  (testing "Validation failure in normal mode"
+    (is (thrown? Exception
+          (with-hl7-stub
+            {"ADT^A01" {:validate {:PID.3.1 "WRONG"}
+                        :handler (fn [msg] (create-ack msg "AA"))}}
+            (let [msg (create-sample-adt)]
+              (send-message msg))))))
+  
   (testing "Validation failure in isolation mode"
     (is (thrown? Exception
           (with-hl7-stub-in-isolation

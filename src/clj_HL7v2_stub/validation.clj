@@ -70,17 +70,15 @@
 
 (defn validation-handler
   "Create a handler that validates before executing the wrapped handler.
-   Throws on validation failure in isolation mode."
+   Throws on validation failure."
   [validations handler isolation-mode?]
   (fn [msg]
     (let [{:keys [valid? errors]} (validate-message msg validations)]
       (if valid?
         (handler msg)
-        (if isolation-mode?
-          (throw (ex-info "Message validation failed"
-                          {:validations validations
-                           :errors errors}))
-          (handler msg))))))
+        (throw (ex-info "Message validation failed"
+                        {:validations validations
+                         :errors errors}))))))
 
 (defn with-validation
   "Wrap a handler with validation logic.

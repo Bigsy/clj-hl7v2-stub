@@ -121,6 +121,65 @@ Verify that messages are sent the expected number of times:
   ;; Test will fail if count doesn't match
 ```
 
+### Message Validation
+
+The library provides powerful validation capabilities to verify that incoming messages contain expected field values:
+
+#### Built-in Validation in Handler Maps
+
+```clojure
+(with-hl7-stub
+  {"ADT^A01" {:validate {:PID.3.1 "12345"           ; Exact match
+                        :PID.5.1 #"SMITH.*"         ; Regex match
+                        :PV1.2 :exists              ; Field must exist
+                        :PV1.44 nil}                ; Field must be empty/nil
+              :handler (fn [msg] (create-ack msg "AA"))}}
+  ;; Test code here
+  )
+```
+
+#### Using the with-validation Helper
+
+```clojure
+(with-hl7-stub
+  {"ADT^A01" (with-validation {:PID.3.1 "12345"
+                              :PID.5.1 #"SMITH.*"}
+                             (fn [msg] (create-ack msg "AA")))}
+  ;; Test code here
+  )
+```
+
+#### Validation Options
+
+- **Exact match**: `{:PID.3.1 "12345"}`
+- **Regex match**: `{:PID.5.1 #"SMITH.*"}`
+- **Predicate function**: `{:PID.7 #(> (count %) 8)}`
+- **Field exists**: `{:PV1.2 :exists}`
+- **Field empty/nil**: `{:PV1.44 nil}`
+
+#### Field Path Formats
+
+All these path formats are supported:
+- Dot notation: `PID.3.1`, `MSH.9.2`
+- Terser format: `/PID-3-1`, `/MSH-9-2`
+- Already normalized: `/PID-3-1`
+
+#### Validation Behavior
+
+Validation failures always throw exceptions with detailed error information:
+
+```clojure
+;; This will throw an exception if validation fails
+(with-hl7-stub
+  {"ADT^A01" {:validate {:PID.3.1 "EXPECTED_ID"}
+              :handler (fn [msg] (create-ack msg "AA"))}}
+  (send-message-with-wrong-id))  ; => throws validation exception
+
+;; Exception contains validation details:
+;; {:validations {:PID.3.1 "EXPECTED_ID"}
+;;  :errors [{:path "PID.3.1" :expected "EXPECTED_ID" :actual "WRONG_ID"}]}
+```
+
 ### Multi-threaded Tests
 
 For tests that send messages from multiple threads, use the global variant:
