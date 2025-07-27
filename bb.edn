@@ -1,0 +1,31 @@
+{:tasks
+ {:init (do (def project 'com.bigsy/hl7v2-stub)
+            (def version "0.1.0"))
+  
+  clean {:doc "Clean build artifacts"
+         :task (shell "rm -rf target")}
+  
+  test {:doc "Run tests"
+        :task (shell "clojure -M:test")}
+  
+  jar {:doc "Build JAR file"
+       :task (shell "clojure -T:build jar")}
+  
+  deploy {:doc "Deploy to Clojars"
+          :depends [jar]
+          :task (shell "clojure -T:build deploy")}
+  
+  outdated {:doc "Check for outdated dependencies"
+            :task (shell "clojure -M:deps list")}
+  
+  repl {:doc "Start REPL"
+        :task (shell "clojure -M:repl")}
+  
+  format {:doc "Format code"
+          :task (shell "cljfmt fix src test")}
+  
+  lint {:doc "Lint code"
+        :task (shell "clj-kondo --lint src")}
+  
+  ci {:doc "Run CI checks (clean, lint, test)"
+      :depends [clean lint test]}}}
