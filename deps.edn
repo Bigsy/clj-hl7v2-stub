@@ -3,7 +3,12 @@
         ca.uhn.hapi/hapi-base {:mvn/version "2.5.1"}
         ca.uhn.hapi/hapi-structures-v24 {:mvn/version "2.5.1"}
         ca.uhn.hapi/hapi-structures-v25 {:mvn/version "2.5.1"}
-        ca.uhn.hapi/hapi-structures-v26 {:mvn/version "2.5.1"}}
+        ca.uhn.hapi/hapi-structures-v26 {:mvn/version "2.5.1"}
+        ;; Optional TCP transport dependencies
+        ;; Only needed if you want to use TCP transport stubbing features
+        ;; exclude these if you only use HAPI transport stubbing
+        manifold/manifold {:mvn/version "0.4.3"}
+        aleph/aleph {:mvn/version "0.9.0"}}
  
  :aliases
  {:dev {:extra-paths ["dev"]
@@ -11,7 +16,10 @@
   
   :test {:extra-paths ["test"]
          :extra-deps {io.github.cognitect-labs/test-runner 
-                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                      {:git/tag "v0.5.1" :git/sha "dfb30dd"}
+                      ;; TCP transport dependencies (for testing TCP features)
+                      manifold/manifold {:mvn/version "0.4.3"}
+                      aleph/aleph {:mvn/version "0.9.0"}}
          :main-opts ["-m" "cognitect.test-runner"]
          :exec-fn cognitect.test-runner.api/test}
   

@@ -1,6 +1,7 @@
 (ns clj-hl7v2-stub.core
   (:require [clj-hl7v2-stub.mock-connection :as mock]
-            [clj-hl7v2-stub.validation :as validate])
+            [clj-hl7v2-stub.validation :as validate]
+            [clj-hl7v2-stub.transports :as transports])
   (:import [ca.uhn.hl7v2 DefaultHapiContext HapiContext]))
 
 ;; Re-export commonly used functions
@@ -110,3 +111,94 @@
 (defmacro with-global-hl7-stub-in-isolation
   [handlers & body]
   `(with-hl7-stub-in-isolation ~handlers ~@body))
+
+;; TCP Transport Macros
+
+(def ^:dynamic *tcp-cleanup-fn* nil)
+
+(defmacro with-tcp-hl7-stub
+  "Stub HL7v2 messages sent via TCP connections (e.g., aleph.tcp clients).
+   Intercepts TCP client creation and MLLP stream handling."
+  [handlers & body]
+  `(let [message-handlers# (setup-message-handlers ~handlers false)
+         handlers-atom# (atom {:handlers message-handlers# 
+                               :isolation-mode false})
+         cleanup-fn# (transports/with-tcp-transport-mocking handlers-atom#)]
+     (binding [*call-counts* (atom {})
+               *tcp-cleanup-fn* cleanup-fn#]
+       (try
+         (let [result# (do ~@body)]
+           (validate-call-counts (normalize-handlers ~handlers))
+           result#)
+         (finally
+           (when cleanup-fn# (cleanup-fn#)))))))
+
+(defmacro with-tcp-hl7-stub-in-isolation
+  "Stub HL7v2 messages sent via TCP connections in isolation mode.
+   Throws exceptions for unmatched messages."
+  [handlers & body]
+  `(let [message-handlers# (setup-message-handlers ~handlers true)
+         handlers-atom# (atom {:handlers message-handlers# 
+                               :isolation-mode true})
+         cleanup-fn# (transports/with-tcp-transport-mocking handlers-atom#)]
+     (binding [*call-counts* (atom {})
+               *tcp-cleanup-fn* cleanup-fn#]
+       (try
+         (let [result# (do ~@body)]
+           (validate-call-counts (normalize-handlers ~handlers))
+           result#)
+         (finally
+           (when cleanup-fn# (cleanup-fn#)))))))
+
+;; Universal stub that detects transport type
+(defmacro with-universal-hl7-stub
+  "Universal HL7v2 stub that supports both HAPI and TCP transports.
+   
+   Usage:
+   (with-universal-hl7-stub 
+     {:transport :tcp ; or :hapi, :auto
+      :handlers {\"ADT^A01\" (fn [msg] (create-ack msg \"AA\"))}}
+     ;; test code)
+   
+   Or with legacy syntax:
+   (with-universal-hl7-stub 
+     {\"ADT^A01\" (fn [msg] (create-ack msg \"AA\"))}
+     ;; test code - defaults to :auto transport detection)"
+  [config & body]
+  `(let [config# ~config
+         transport# (or (:transport config#) :auto)
+         handlers# (or (:handlers config#) config#)
+         isolation-mode# (boolean (:isolation config#))]
+     (case transport#
+       :hapi (if isolation-mode#
+               (with-hl7-stub-in-isolation handlers# ~@body)
+               (with-hl7-stub handlers# ~@body))
+       :tcp (if isolation-mode#
+              (with-tcp-hl7-stub-in-isolation handlers# ~@body)
+              (with-tcp-hl7-stub handlers# ~@body))
+       :auto 
+       ;; Auto-detection: try both transports simultaneously
+       (let [message-handlers# (setup-message-handlers handlers# isolation-mode#)
+             handlers-atom# (atom {:handlers message-handlers# 
+                                   :isolation-mode isolation-mode#})
+             mock-context# (mock/create-mock-context handlers-atom#)
+             tcp-cleanup-fn# (transports/with-tcp-transport-mocking handlers-atom#)]
+         (binding [*mock-context* mock-context#
+                   *call-counts* (atom {})
+                   *tcp-cleanup-fn* tcp-cleanup-fn#]
+           (try
+             (let [result# (do ~@body)]
+               (validate-call-counts (normalize-handlers handlers#))
+               result#)
+             (finally
+               (when tcp-cleanup-fn# (tcp-cleanup-fn#)))))))))
+
+;; Helper function to create mock MLLP stream for custom protocol stubs
+(defn create-mock-mllp-stream
+  "Create a mock MLLP stream for custom protocol implementations.
+   Returns a function that can replace protocol/mllp-stream calls."
+  [handlers]
+  (let [message-handlers (setup-message-handlers handlers false)
+        handlers-atom (atom {:handlers message-handlers 
+                             :isolation-mode false})]
+    (transports/mock-mllp-stream-fn handlers-atom)))
