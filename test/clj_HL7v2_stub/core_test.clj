@@ -1,9 +1,7 @@
-(ns clj-HL7v2-stub.core-test
+(ns clj-hl7v2-stub.core-test
   (:require [clojure.test :refer :all]
-            [clj-HL7v2-stub.core :refer :all])
-  (:import [ca.uhn.hl7v2 DefaultHapiContext HapiContext]
-           [ca.uhn.hl7v2.model.v24.message ADT_A01 ORU_R01]
-           [ca.uhn.hl7v2.parser PipeParser]))
+            [clj-hl7v2-stub.core :refer :all])
+  (:import [ca.uhn.hl7v2.parser PipeParser]))
 
 (def ^:private parser (PipeParser.))
 

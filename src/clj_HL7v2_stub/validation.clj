@@ -1,4 +1,4 @@
-(ns clj-HL7v2-stub.validation
+(ns clj-hl7v2-stub.validation
   (:require [clojure.string :as str])
   (:import [ca.uhn.hl7v2.util Terser]))
 

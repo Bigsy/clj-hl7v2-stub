@@ -1,6 +1,6 @@
-(ns clj-HL7v2-stub.core
-  (:require [clj-HL7v2-stub.mock-connection :as mock]
-            [clj-HL7v2-stub.validation :as validate])
+(ns clj-hl7v2-stub.core
+  (:require [clj-hl7v2-stub.mock-connection :as mock]
+            [clj-hl7v2-stub.validation :as validate])
   (:import [ca.uhn.hl7v2 DefaultHapiContext HapiContext]))
 
 ;; Re-export commonly used functions

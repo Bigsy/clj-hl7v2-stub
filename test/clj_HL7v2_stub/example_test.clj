@@ -1,6 +1,6 @@
-(ns clj-HL7v2-stub.example-test
+(ns clj-hl7v2-stub.example-test
   (:require [clojure.test :refer :all]
-            [clj-HL7v2-stub.core :refer :all])
+            [clj-hl7v2-stub.core :refer :all])
   (:import [ca.uhn.hl7v2.util Terser]
            [ca.uhn.hl7v2.parser PipeParser]))
 

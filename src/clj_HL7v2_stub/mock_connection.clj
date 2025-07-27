@@ -1,4 +1,4 @@
-(ns clj-HL7v2-stub.mock-connection
+(ns clj-hl7v2-stub.mock-connection
   (:import [ca.uhn.hl7v2.app Connection ConnectionFactory Initiator]
            [ca.uhn.hl7v2.model Message]
            [ca.uhn.hl7v2.util Terser]

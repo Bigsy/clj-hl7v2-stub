@@ -15,12 +15,12 @@
                 :version version
                 :basis (b/create-basis {:project "deps.edn"})
                 :src-dirs ["src"]
-                :scm {:url "https://github.com/Bigsy/clj-HL7v2-stub"
-                      :connection "scm:git:git://github.com/Bigsy/clj-HL7v2-stub.git"
-                      :developerConnection "scm:git:ssh://git@github.com/Bigsy/clj-HL7v2-stub.git"
+                :scm {:url "https://github.com/Bigsy/clj-hl7v2-stub"
+                      :connection "scm:git:git://github.com/Bigsy/clj-hl7v2-stub.git"
+                      :developerConnection "scm:git:ssh://git@github.com/Bigsy/clj-hl7v2-stub.git"
                       :tag (str "v" version)}
                 :pom-data [[:description "A Clojure library for stubbing HL7v2 message communication in tests"]
-                           [:url "https://github.com/Bigsy/clj-HL7v2-stub"]
+                           [:url "https://github.com/Bigsy/clj-hl7v2-stub"]
                            [:licenses
                             [:license
                              [:name "Eclipse Public License"]

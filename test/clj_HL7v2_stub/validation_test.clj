@@ -1,11 +1,10 @@
-(ns clj-HL7v2-stub.validation-test
+(ns clj-hl7v2-stub.validation-test
   (:require [clojure.test :refer [deftest is testing]]
-            [clj-HL7v2-stub.core :refer [with-hl7-stub with-hl7-stub-in-isolation 
+            [clj-hl7v2-stub.core :refer [with-hl7-stub with-hl7-stub-in-isolation 
                                          get-context create-ack validate-message 
                                          with-validation]]
-            [clj-HL7v2-stub.validation :as validate])
-  (:import [ca.uhn.hl7v2.util Terser]
-           [ca.uhn.hl7v2.parser PipeParser]))
+            [clj-hl7v2-stub.validation :as validate])
+  (:import [ca.uhn.hl7v2.parser PipeParser]))
 
 (def ^:private parser (PipeParser.))
 

@@ -1,7 +1,7 @@
 (ns user
   (:require [hashp.core]
-            [clj-HL7v2-stub.core :as stub]
-            [clj-HL7v2-stub.mock-connection :as mock]
+            [clj-hl7v2-stub.core :as stub]
+            [clj-hl7v2-stub.mock-connection :as mock]
             [clojure.repl :refer [doc source]]
             [clojure.pprint :refer [pprint]])
   (:import [ca.uhn.hl7v2.parser PipeParser]
