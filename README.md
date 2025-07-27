@@ -1,4 +1,4 @@
-# clj-HL7v2-stub
+# clj-hl7v2-stub
 
 [![Clojars Project](https://img.shields.io/clojars/v/org.clojars.bigsy/clj-hl7v2-stub.svg)](https://clojars.org/org.clojars.bigsy/clj-hl7v2-stub)
 
@@ -18,7 +18,7 @@ Add to your `deps.edn`:
 
 ```clojure
 (ns myapp.test
-  (:require [clj-HL7v2-stub.core :refer [with-hl7-stub create-ack get-context]]
+  (:require [clj-hl7v2-stub.core :refer [with-hl7-stub create-ack get-context]]
             [clojure.test :refer :all])
   (:import [ca.uhn.hl7v2.parser PipeParser]))
 
