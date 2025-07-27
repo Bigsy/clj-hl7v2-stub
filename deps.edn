@@ -1,5 +1,9 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}}
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        ca.uhn.hapi/hapi-base {:mvn/version "2.5.1"}
+        ca.uhn.hapi/hapi-structures-v24 {:mvn/version "2.5.1"}
+        ca.uhn.hapi/hapi-structures-v25 {:mvn/version "2.5.1"}
+        ca.uhn.hapi/hapi-structures-v26 {:mvn/version "2.5.1"}}
  
  :aliases
  {:test {:extra-paths ["test"]
