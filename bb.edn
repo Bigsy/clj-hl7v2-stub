@@ -1,5 +1,5 @@
 {:tasks
- {:init (do (def project 'com.bigsy/hl7v2-stub)
+ {:init (do (def project 'org.clojars.bigsy/clj-hl7v2-stub)
             (def version "0.1.0"))
   
   clean {:doc "Clean build artifacts"

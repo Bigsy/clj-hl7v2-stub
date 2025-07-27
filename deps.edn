@@ -1,5 +1,5 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.1"}
         ca.uhn.hapi/hapi-base {:mvn/version "2.5.1"}
         ca.uhn.hapi/hapi-structures-v24 {:mvn/version "2.5.1"}
         ca.uhn.hapi/hapi-structures-v25 {:mvn/version "2.5.1"}
@@ -15,16 +15,17 @@
          :main-opts ["-m" "cognitect.test-runner"]
          :exec-fn cognitect.test-runner.api/test}
   
-  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.9"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
           :ns-default build}
   
   :jar {:replace-deps {io.github.seancorfield/depstar {:mvn/version "2.1.303"}}
         :exec-fn hf.depstar/jar
-        :exec-args {:jar "hl7v2-stub.jar"
+        :exec-args {:jar "clj-hl7v2-stub.jar"
                     :sync-pom true}}
   
   :deploy {:replace-deps {slipset/deps-deploy {:mvn/version "0.2.2"}}
            :exec-fn deps-deploy.deps-deploy/deploy
            :exec-args {:installer :remote
                        :sign-releases? false
-                       :artifact "hl7v2-stub.jar"}}}}
+                       :artifact "clj-hl7v2-stub.jar"}}}}

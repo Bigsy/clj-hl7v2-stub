@@ -1,4 +1,6 @@
-# hl7v2-stub
+# clj-HL7v2-stub
+
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.bigsy/clj-hl7v2-stub.svg)](https://clojars.org/org.clojars.bigsy/clj-hl7v2-stub)
 
 A Clojure library for stubbing out HL7v2 message communication in tests. It allows you to intercept HL7v2 messages sent via HAPI and return predefined responses without requiring actual MLLP connections.
 
@@ -7,7 +9,7 @@ A Clojure library for stubbing out HL7v2 message communication in tests. It allo
 Add to your `deps.edn`:
 
 ```clojure
-{:deps {com.example/hl7v2-stub {:mvn/version "0.1.0"}}}
+{:deps {org.clojars.bigsy/clj-hl7v2-stub {:mvn/version "0.1.0"}}}
 ```
 
 ## Usage
@@ -16,7 +18,7 @@ Add to your `deps.edn`:
 
 ```clojure
 (ns myapp.test
-  (:require [hl7v2-stub.core :refer [with-hl7-stub create-ack get-context]]
+  (:require [clj-HL7v2-stub.core :refer [with-hl7-stub create-ack get-context]]
             [clojure.test :refer :all])
   (:import [ca.uhn.hl7v2.parser PipeParser]))
 
