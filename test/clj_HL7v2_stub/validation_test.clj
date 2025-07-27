@@ -129,3 +129,111 @@
               response (send-message msg)]
           (is (not (nil? @received-msg)))
           (is (.contains (.encode parser response) "MSA|AA")))))))
+
+(deftest test-comprehensive-validation-types
+  (testing "All validation types work in handler context"
+    
+    (testing "Exact string match validation"
+      (let [received (atom false)]
+        (with-hl7-stub
+          {"ADT^A01" {:validate {:PID.3.1 "12345"}
+                      :handler (fn [msg] 
+                                (reset! received true)
+                                (create-ack msg "AA"))}}
+          (let [msg (create-sample-adt)]
+            (send-message msg)
+            (is @received)))))
+    
+    (testing "Regex match validation"
+      (let [received (atom false)]
+        (with-hl7-stub
+          {"ADT^A01" {:validate {:PID.5.1 #"SMITH.*"}
+                      :handler (fn [msg] 
+                                (reset! received true)
+                                (create-ack msg "AA"))}}
+          (let [msg (create-sample-adt)]
+            (send-message msg)
+            (is @received)))))
+    
+    (testing "Predicate function validation"
+      (let [received (atom false)]
+        (with-hl7-stub
+          {"ADT^A01" {:validate {:PID.3.1 #(= 5 (count %))}
+                      :handler (fn [msg] 
+                                (reset! received true)
+                                (create-ack msg "AA"))}}
+          (let [msg (create-sample-adt)]
+            (send-message msg)
+            (is @received)))))
+    
+    (testing "Field exists validation"
+      (let [received (atom false)]
+        (with-hl7-stub
+          {"ADT^A01" {:validate {:PID.3.1 :exists}
+                      :handler (fn [msg] 
+                                (reset! received true)
+                                (create-ack msg "AA"))}}
+          (let [msg (create-sample-adt)]
+            (send-message msg)
+            (is @received)))))
+    
+    (testing "Field nil/empty validation"
+      (let [received (atom false)]
+        (with-hl7-stub
+          {"ADT^A01" {:validate {:PID.99.1 nil}  ; This field doesn't exist, should be nil
+                      :handler (fn [msg] 
+                                (reset! received true)
+                                (create-ack msg "AA"))}}
+          (let [msg (create-sample-adt)]
+            (send-message msg)
+            (is @received)))))
+    
+    (testing "Multiple validation rules"
+      (let [received (atom false)]
+        (with-hl7-stub
+          {"ADT^A01" {:validate {:PID.3.1 "12345"
+                                :PID.5.1 #"SMITH.*"
+                                :PV1.2 :exists
+                                :PID.99.1 nil}
+                      :handler (fn [msg] 
+                                (reset! received true)
+                                (create-ack msg "AA"))}}
+          (let [msg (create-sample-adt)]
+            (send-message msg)
+            (is @received)))))))
+
+(deftest test-validation-failure-scenarios
+  (testing "Exact match failure"
+    (is (thrown? Exception
+          (with-hl7-stub
+            {"ADT^A01" {:validate {:PID.3.1 "WRONG_ID"}
+                        :handler (fn [msg] (create-ack msg "AA"))}}
+            (send-message (create-sample-adt))))))
+  
+  (testing "Regex match failure"
+    (is (thrown? Exception
+          (with-hl7-stub
+            {"ADT^A01" {:validate {:PID.5.1 #"JONES.*"}
+                        :handler (fn [msg] (create-ack msg "AA"))}}
+            (send-message (create-sample-adt))))))
+  
+  (testing "Predicate function failure"
+    (is (thrown? Exception
+          (with-hl7-stub
+            {"ADT^A01" {:validate {:PID.3.1 #(= 10 (count %))}  ; PID is "12345" (5 chars)
+                        :handler (fn [msg] (create-ack msg "AA"))}}
+            (send-message (create-sample-adt))))))
+  
+  (testing "Field exists failure"
+    (is (thrown? Exception
+          (with-hl7-stub
+            {"ADT^A01" {:validate {:PID.99.1 :exists}  ; This field doesn't exist
+                        :handler (fn [msg] (create-ack msg "AA"))}}
+            (send-message (create-sample-adt))))))
+  
+  (testing "Field nil validation failure"
+    (is (thrown? Exception
+          (with-hl7-stub
+            {"ADT^A01" {:validate {:PID.3.1 nil}  ; This field has value "12345"
+                        :handler (fn [msg] (create-ack msg "AA"))}}
+            (send-message (create-sample-adt)))))))
